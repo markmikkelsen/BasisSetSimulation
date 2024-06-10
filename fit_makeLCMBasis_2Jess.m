@@ -70,7 +70,7 @@ for kk = 1:nMets
     % Load the signals, DC-correct and store them in separate dimensions
     for ll = 1:length(basisFct)
         if isfield(temp.(basisFct{1}), 'centerFreq')
-            buffer.centerFreq           = temp.(basisFct{1}).centerFreq;
+            buffer.centerFreq = temp.(basisFct{1}).centerFreq;
         else
             temp.(basisFct{1}).centerFreq = 3;
             buffer.centerFreq = 3;
