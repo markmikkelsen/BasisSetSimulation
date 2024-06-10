@@ -1,5 +1,3 @@
-clear all;
-close all;
 % run_simSemiLASERShaped_fast.m
 % Jamie Near, McGill University 2015.
 % Dana Goerzen and Jamie Near, McGill University 2021.
@@ -59,11 +57,15 @@ close all;
 % OUTPUTS:
 % out               = Simulation results, summed over all space.
 
+clear;
+close all;
+clc;
+
 % ************INPUT PARAMETERS**********************************
 % 
 % Define the variable Basis_name at the beginning of your script
-basis_name = 'lcm_gamma_new.basis' ; %keep "_gamma_" 
 pathtofida='/Users/jessicaarchibald/Desktop/GLUATLAS/FID-A-master2022';
+basis_name = 'lcm_gamma_new.basis'; %keep "_gamma_" 
 addpath(genpath(pathtofida));
 folder_to_save=[pathtofida,'/GeneratedRawFiles/sLASER_JESS_2024/'];
 save_result=true;
@@ -126,7 +128,7 @@ sysRef.name='Ref_0ppm';
 %
 sysRef.centreFreq=centreFreq;
 %
-[ ref] = run_mysLASERShaped_fast(rfPulse,refTp,Npts,sw,lw,Bfield,thkX,thkY,x,y,te,sysRef,flip_angle);
+ref = run_mysLASERShaped_fast(rfPulse,refTp,Npts,sw,lw,Bfield,thkX,thkY,x,y,te,sysRef,flip_angle);
 %
 tau1=15; tau2=13;%fake timing
 refjustforppmrange=sim_press(Npts,sw,Bfield,lw,sysRef,tau1,tau2);
@@ -140,14 +142,14 @@ shift_in_points=round(shift_in_ppm/ppm_per_point);
 ref.fids=ref.fids.*exp(-1i*2*pi*shift_in_points*(0:1:(size(ref.fids,1)-1)).'/(size(ref.fids,1)));
 %--------------------------------------------------------------------------
 % Additional Metabolites
-[sysETH,sysAcetate,sysAcac,sysSucc,sysGlyc,sysVal,sysAceton,sysbHBHM]=define_spin_systems();
+[sysETH,sysAcetate,sysAcac,sysSucc,sysGlyc,sysVal,sysAceton,sysbHBHM]=define_spin_systems;
 
 %-------------------------------------------------------------------------
 %Load spin systems (for the rest)
 load([pathtofida,'/simulationTools/metabolites/spinSystems'])
 %-------------------------------------------------------------------------
 
-for met_nr=1:size(spinSysList,2);
+for met_nr=1:size(spinSysList,2)
     %
     spinSys=spinSysList{met_nr}; %spin system to simulate
     sys=eval(['sys' spinSys]);
@@ -157,12 +159,12 @@ for met_nr=1:size(spinSysList,2);
     %-------------------------------------------------------------------------
     % Simulation
     %-------------------------------------------------------------------------
-    [ out] = run_mysLASERShaped_fast(rfPulse,refTp,Npts,sw,lw,Bfield,thkX,thkY,x,y,te,sys,flip_angle);
+    out = run_mysLASERShaped_fast(rfPulse,refTp,Npts,sw,lw,Bfield,thkX,thkY,x,y,te,sys,flip_angle);
     % save out as
     % Save before the shift -
     save_out_mat=[folder_to_save,'matfiles_pre'];
-    if (exist(save_out_mat,'dir')==0)
-                 mkdir(save_out_mat);
+    if ~exist(save_out_mat,'dir')
+        mkdir(save_out_mat);
     end
     save([save_out_mat,'/',spinSys],'out')
 
@@ -184,17 +186,18 @@ for met_nr=1:size(spinSysList,2);
     %effvox=op_addScans(effvox,ref);
     %
     save_figure=[folder_to_save,'figures'];
-    if (exist(save_figure,'dir')==0)
-                 mkdir(save_figure);
+    if ~exist(save_figure,'dir')
+        mkdir(save_figure);
     end
     % figure
-    figure;plot(refjustforppmrange.ppm,real(ifftshift(ifft(out.fids))),'b')
-    set(gca,'xdir','reverse')
+    figure;
+    plot(refjustforppmrange.ppm,real(ifftshift(ifft(out.fids))),'b');
+    set(gca,'xdir','reverse');
     colormap;set(gcf,'color','w');
-    xlim([-1 5])
+    xlim([-1 5]);
     xlabel('ppm');
-    title(['figure with ref',spinSys])
-    print('-dpng','-r300',[save_figure,'/',spinSys])
+    title(['figure with ref',spinSys]);
+    print('-dpng','-r300',[save_figure,'/',spinSys]);
     % effvoxel
     %figure;plot(ref.ppm,real(ifftshift(ifft(effvox.fids))),'b')
     %set(gca,'xdir','reverse')
@@ -205,8 +208,8 @@ for met_nr=1:size(spinSysList,2);
     save_raw=[folder_to_save,'raw'];
 
     if save_result
-        if (exist(save_raw,'dir')==0)
-                 mkdir(save_raw);
+        if ~exist(save_raw,'dir')
+            mkdir(save_raw);
         end
 
         RF=io_writelcmraw(out,[save_raw, '/', spinSys '.raw'],spinSys);
