@@ -211,16 +211,14 @@ for met_nr=1:size(spinSysList,2)
         if ~exist(save_raw,'dir')
             mkdir(save_raw);
         end
-
         RF=io_writelcmraw(out,[save_raw, '/', spinSys '.raw'],spinSys);
-       
     end
- % Saving after shift   
+    % Saving after shift
     save_out_mat_end=[folder_to_save,'matfiles_post'];
-    if (exist(save_out_mat_end,'dir')==0)
-                 mkdir(save_out_mat_end);
+    if ~exist(save_out_mat_end,'dir')
+        mkdir(save_out_mat_end);
     end
-    save([save_out_mat_end,'/',spinSys],'out')
+    save([save_out_mat_end,'/',spinSys],'out');
     
 end
 disp('Running fit_makeLCMBasis...');
@@ -234,4 +232,4 @@ BASIS=fit_makeLCMBasis_2Jess(save_out_mat_end, false, [folder_to_save,'/', basis
 rmpath(genpath(pathtofida));
 disp('Done');
 
-       
+close all;

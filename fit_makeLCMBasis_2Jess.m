@@ -35,7 +35,7 @@
 % Unterschiede in ifft und fft
 
 
-function [BASIS] = fit_makeLCMBasis_2Jess(folder, addMMFlag,fullpath_to_save_basis,vendor,sequence)
+function BASIS = fit_makeLCMBasis_2Jess(folder, addMMFlag,fullpath_to_save_basis,vendor,sequence)
 
 % folder that contains all matfiles form simulation
 % addMMflag
@@ -56,7 +56,7 @@ idx = contains(mat_filenames, 'Ref');
 mat_filenames(idx) = [];
 nMets           = length(mat_filenames);
 %
-disp(sprintf('Number of Metabolites : %d',nMets))
+fprintf('Number of Metabolites : %d\n',nMets)
 %
 % Loop over all *.mat filenames, load their data, store in a buffer
 %
@@ -84,7 +84,7 @@ for kk = 1:nMets
         spectralwidth = temp.(basisFct{ll}).spectralwidth;
         sz = temp.(basisFct{ll}).sz;
         Bo = temp.(basisFct{ll}).Bo;
-        f=[(-spectralwidth/2)+(spectralwidth/(2*sz(1))):spectralwidth/(sz(1)):(spectralwidth/2)-(spectralwidth/(2*sz(1)))];
+        f=(-spectralwidth/2)+(spectralwidth/(2*sz(1))):spectralwidth/(sz(1)):(spectralwidth/2)-(spectralwidth/(2*sz(1)));
         ppm=f/(Bo*42.577);
         ppm=-(ppm-4.65); % achtung 4.68 before
 
@@ -98,7 +98,7 @@ for kk = 1:nMets
         % turned out to be not that relevant)
         % if in makebasis PPMOFF is set, then something similiar is done 
         if do_offset_correction
-            temp.(basisFct{ll})            = op_dccorr(temp.(basisFct{ll}),'p'); 
+            temp.(basisFct{ll})        = op_dccorr(temp.(basisFct{ll}),'p'); 
         end
         buffer.fids(:,kk,ll)           = temp.(basisFct{ll}).fids;
         buffer.specs(:,kk,ll)          = temp.(basisFct{ll}).specs;
@@ -167,7 +167,7 @@ if addMMFlag
     
     % To scale the amplitudes correctly, we first need to determine the
     % area of the 3.027 ppm CH3 signal of creatine
-    [CrArea] = detCrArea(buffer);
+    CrArea = detCrArea(buffer);
     oneProtonArea = CrArea/3;
     
     % Next, we determine the area of a Gaussian singlet with nominal area 1
@@ -206,10 +206,10 @@ if addMMFlag
     
     % Now copy over the names, fids, and specs into the basis set structure
     for rr = 1:length(MMLips)
-        buffer.name{nMets+rr}       = MMLips{rr};
+        buffer.name{nMets+rr} = MMLips{rr};
         for qq = 1:length(basisFct)
-            buffer.fids(:,nMets+rr,qq)   = MMBase.(MMLips{rr}).fids;
-            buffer.specs(:,nMets+rr,qq)  = MMBase.(MMLips{rr}).specs;
+            buffer.fids(:,nMets+rr,qq)  = MMBase.(MMLips{rr}).fids;
+            buffer.specs(:,nMets+rr,qq) = MMBase.(MMLips{rr}).specs;
         end
     end
     
@@ -459,7 +459,7 @@ end
 % OUTPUTS:
 % CrArea    = Estimated area under the 3.027 ppm CH3 Cr singlet.
 
-function [CrArea] = detCrArea(in);
+function [CrArea] = detCrArea(in)
 
 % Find the creatine basis function
 idx_Cr          = find(strcmp(in.name,'Cr'));
